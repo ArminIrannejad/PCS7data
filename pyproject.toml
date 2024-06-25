@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "PCS7data"
+version = "0.0.0"
+description = "PCS7 Data Fetching, XML Archive"
+authors  = ["ArminIrannejad <armin.irannejad@gmail.com>"]
+readme = "README.md"
+packages = [
+	{ include = "PCS7data", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+lxml = "^5.2.2"
+pandas = "^2.2.2"
+
+[tool.poetry.group.dev.dependencies]
+python-semantic-release = "^7.33.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.semantic_release]
+version_variable = "pyproject.toml:version"
+branch = "main"
+changelog_file = "CHANGELOG.md"
+build_command = "poetry build"
+dist_path = "dist/"
+remove_dist = false

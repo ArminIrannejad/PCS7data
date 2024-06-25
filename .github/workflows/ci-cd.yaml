@@ -1,0 +1,61 @@
+name: ci-cd
+
+run-name: ${{ github.actor }} Updated PCS7Data
+
+on: [push, pull_request]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GH_TOKEN }}
+
+    - name: Install poetry
+      run: pip install poetry
+
+    - name: Install package
+      run: poetry install
+
+  cd:
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GH_TOKEN }}
+        fetch-depth: 0
+
+    - name: Install poetry
+      run: pip install poetry
+
+    - name: Install package
+      run: poetry install
+
+    - name: Ensure Git tags are up-to-date
+      run: git fetch --tags
+
+    - name: Use Python Semantic Release to prepare release
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        git config user.name "ArminIrannejad"
+        git config user.email "armin.irannejad@gmail.com"
+        git remote set-url origin https://${{ secrets.GH_TOKEN }}@github.com/ArminIrannejad/PCS7data.git
+        poetry run semantic-release publish
