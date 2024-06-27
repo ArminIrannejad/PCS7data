@@ -16,7 +16,7 @@ class DataProcessor:
         self.path = path
 
     def file_filter(self, file, start_number, end_number, includes):
-        m_pattern = re.compile(r'M(d\{3})')
+        m_pattern = re.compile(r'M(\d{3})')
         match = m_pattern.search(file)
         if match:
             number = int(match.group(1))
@@ -24,7 +24,23 @@ class DataProcessor:
                 if any(include in file for include in includes):
                     return True
         return False 
-    def process(self):
+
+    def extract_batch_nummer(self, filename):
+        ignore = 'SB8_34633-5543-83_'
+        if filename.startswith(ignore):
+            filename = filename[len(ignore):]
+        start_index = filename.find('M')
+        if start_index != -1:
+            result = filename[start_index: start_index + 10]
+            return result
+
+    def process(self, file):
+        if '"' in file:
+            return None
+        file_path = fr'{self.path}\{file}'
+        tree = etree.parse(file_path)
+        root = tree.getroot()
+
         pass
 
 def main():
