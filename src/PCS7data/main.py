@@ -12,9 +12,9 @@ class DataFetcher:
         pass    
 
 class DataProcessor:
-    def __init__(self, path):
-        self.path = path
-
+    def __init__(self):
+        self.path = os.getenv("MY_PATH")
+        
     def file_filter(self, file, start_number, end_number, includes):
         m_pattern = re.compile(r'M(\d{3})')
         match = m_pattern.search(file)
@@ -25,7 +25,7 @@ class DataProcessor:
                     return True
         return False 
 
-    def extract_batch_nummer(self, filename):
+    def extract_batch_number(self, filename):
         ignore = 'SB8_34633-5543-83_'
         if filename.startswith(ignore):
             filename = filename[len(ignore):]
@@ -34,17 +34,31 @@ class DataProcessor:
             result = filename[start_index: start_index + 10]
             return result
 
-    def process(self, file):
-        if '"' in file:
-            return None
-        file_path = fr'{self.path}\{file}'
+    def process(self, file, xpath, namespace):
+        results = [file]
+        file_path = f'{self.path}/{file}'
         tree = etree.parse(file_path)
         root = tree.getroot()
+        for xpath in xpath.values():
+            parvalfloats = root.xpath(xpath, namespace=namespace)
+            if parvalfloats:
+                lst = [parvalfloat for parvalfloat in parvalfloats]
+                results.append(str(list(set(lst))[0] if len(set(lst)) == 1 else None))
+            else:
+                results.append(None)
+        return results
 
-        pass
+
+                
+
 
 def main():
-    pass
+    processor = DataProcessor()
+    filenames = processor.file_filter()
+
+    with ThreadPoolExecutor() as executor:
+        batch_numbers = list(executor.map(processor.extract_batch_number, filenames))
+    print(batch_numbers)
 
 if __name__ == "__main__":
     main()
