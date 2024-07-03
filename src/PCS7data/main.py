@@ -4,12 +4,9 @@ import pandas as pd
 from lxml import etree
 from concurrent.futures import ThreadPoolExecutor
 
-from pandas._libs.tslibs import timestamps
-
 class DataFetcher:
-    def __init__(self):
-        self.path = os.getenv("MY_PATH")
-
+    def __init__(self, path):
+        self.path = path
     def file_filter(self, file, start_number, end_number, includes, excludes):
         m_pattern = re.compile(r'M(\d{3})')
         match = m_pattern.search(file)
@@ -26,9 +23,8 @@ class DataFetcher:
         return list(filter(None, filtered_files))
 
 class DataProcessor:
-    def __init__(self):
-        self.path = os.getenv("MY_PATH")
-
+    def __init__(self, path):
+        self.path = path
     def extract_batch_number(self, filename):
         ignore = 'SB8_34633-5543-83_'
         if filename.startswith(ignore):
@@ -71,9 +67,9 @@ class DataProcessor:
         return str(list(set(lst))[-1]) if len(set(lst)) < 2 else None    
 
 def main():
-    processor = DataProcessor()
-    fetcher = DataFetcher()
-    path = fetcher.path
+    path = os.getenv("MY_PATH")
+    processor = DataProcessor(path)
+    fetcher = DataFetcher(path)
     filenames = os.listdir(path)
 
     start_number = 000
