@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.0 (2024-07-03)
+
+### Feature
+
+* Time df ([`6cefe3e`](https://github.com/ArminIrannejad/PCS7data/commit/6cefe3e1f49b99b90b01a0686174c428d6fbbaab))
+
 ## v0.1.6 (2024-07-03)
 
 
