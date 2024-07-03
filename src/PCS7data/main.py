@@ -44,7 +44,7 @@ class DataProcessor:
             parvalfloats = root.xpath(xpath, namespace=namespace)
             if parvalfloats:
                 lst = [parvalfloat for parvalfloat in parvalfloats]
-                results.append(str(list(set(lst))[0] if len(set(lst)) == 1 else None))
+                results.append(str(list(set(lst))[-1] if len(set(lst)) < 2 else None))
             else:
                 results.append(None)
         return results
