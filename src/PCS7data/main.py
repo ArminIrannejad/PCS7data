@@ -4,6 +4,8 @@ import pandas as pd
 from lxml import etree
 from concurrent.futures import ThreadPoolExecutor
 
+from pandas._libs.tslibs import timestamps
+
 class DataFetcher:
     def __init__(self):
         self.path = os.getenv("MY_PATH")
@@ -51,19 +53,46 @@ class DataProcessor:
                 results.append(None)
         return results
 
+    def get_time(self, file):
+        namespaces = {'ns': 'SIMATIC_BATCH_V8_1_0'}
+        xpath = "//ns:Archivebatch/ns:Cr"
+        if '"' in file:
+            return None
+        file_path = f'{self.path}/{file}'
+        tree = etree.parse(file_path)
+        root = tree.getroot()
+        parvalfloats = root.xpath(xpath, namespaces=namespaces)
+        if not parvalfloats:
+            return None
+        lst = [
+        f"{parvalfloat.get('actstart')} {parvalfloat.get('actend')}"
+        for parvalfloat in parvalfloats
+        ]
+        return str(list(set(lst))[-1]) if len(set(lst)) < 2 else None    
+
 def main():
     processor = DataProcessor()
     fetcher = DataFetcher()
     path = fetcher.path
     filenames = os.listdir(path)
 
-    start_number = 234
-    end_number = 460
-    includes = ["CIP", "516"]
-    excludes = ["TEST", "AL", "EXTRA", "BUFF", "SAT", "SIP",]
+    start_number = 000
+    end_number = 1000 
+    includes = ["654"]
+    excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "CIP", "516", "MIN", ]
 
     filtered_files = fetcher.fetcher(filenames, start_number, end_number, includes, excludes)
     print(len(filtered_files))
+
+    with ThreadPoolExecutor() as executor:
+        batch_numbers = list(executor.map(processor.extract_batch_number, filtered_files))
+
+    with ThreadPoolExecutor() as executor:
+        timestamps = list(executor.map(processor.get_time, filtered_files))
+
+    print(len(batch_numbers))
+    print(timestamps)
+
 
 if __name__ == "__main__":
     main()
