@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.1 (2024-07-04)
+
+
+
 ## v0.2.0 (2024-07-03)
 
 ### Feature
