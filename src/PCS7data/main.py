@@ -39,14 +39,14 @@ class DataProcessor:
 
     def process(self, file, xpaths, namespaces):
         results = [file]
-        file_path = fr'{self.path}\{file}'
+        file_path = fr'{self.path}/{file}'
         tree = etree.parse(file_path)
         root = tree.getroot()
         for xpath in xpaths.values():
             parvalfloats = root.xpath(xpath, namespaces=namespaces)
             if parvalfloats:
                 lst = [parvalfloat for parvalfloat in parvalfloats]
-                results.append(str(list(set(lst))[-1] if len(set(lst)) < 2 else None))
+                results.append(str(list(set(lst))[-1] if len(set(lst)) < 3 else None))
             else:
                 results.append(None)
         return results
@@ -54,9 +54,7 @@ class DataProcessor:
     def get_time_(self, file):
         namespaces = {'ns': 'SIMATIC_BATCH_V8_1_0'}
         xpath = "//ns:Archivebatch/ns:Cr"
-        if '"' in file:
-            return None
-        file_path = fr'{self.path}\{file}'
+        file_path = fr'{self.path}/{file}'
         tree = etree.parse(file_path)
         root = tree.getroot()
         parvalfloats = root.xpath(xpath, namespaces=namespaces)
@@ -66,7 +64,7 @@ class DataProcessor:
         f"{parvalfloat.get('actstart')} {parvalfloat.get('actend')}"
         for parvalfloat in parvalfloats
         ]
-        return str(list(set(lst))[-1]).split() if len(set(lst)) < 2 else None    
+        return str(list(set(lst))[-1]).split() if len(set(lst)) == 1 else None    
 
     def time_diff_(self, row):
         if pd.isnull(row['Start_time']) or pd.isnull(row['End_time']):
@@ -88,19 +86,20 @@ class DataProcessor:
         start_times = [timestamp[0] if timestamp is not None else None for timestamp in timestamps]
         end_times = [timestamp[1] if timestamp is not None else None for timestamp in timestamps]
         dict_time = {
-                'Batch_Numbers': batch_numbers,
+                'Batch_number': batch_numbers,
                 'Start_time': start_times,
                 'End_time': end_times, 
                 'File': files,
         }
         df = pd.DataFrame(dict_time)
         df[['Difference', 'Total_Seconds']] = df.apply(self.time_diff_, axis=1)
-        df = df.dropna(subset=['Start_time', 'End_time', 'Batch_Numbers'])
-        df = df[['Batch_Numbers', 'Difference', 'Start_time', 'End_time', 'File', 'Total_Seconds']]  
+        df = df.dropna(subset=['Start_time', 'End_time', 'Batch_number'])
+        df = df[['Batch_number', 'Difference', 'Start_time', 'End_time', 'File', 'Total_Seconds']]  
         return df
 
 def main():
     path = os.getenv("MY_PATH")
+    path = '/mnt/c/Users/se1irar/Downloads/Archive/'
     processor = DataProcessor(path)
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
@@ -108,18 +107,21 @@ def main():
     start_number = 400
     end_number = 500 
     includes = ["516"]
-    excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "654", "MIN", "CIP", "656",]
+    excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "654", "MIN", "CIP", "656", "GRF"]
 
     filtered_files = fetcher.fetcher(filenames, start_number, end_number, includes, excludes)
+    print(len(filtered_files))
 
     with ThreadPoolExecutor() as executor:
         batch_numbers = list(executor.map(processor.extract_batch_number, filtered_files))
+    print(len(batch_numbers))
 
     times = processor.get_time(batch_numbers, filtered_files)
-    
+    print(times)
+
     namespaces = {'ns': 'SIMATIC_BATCH_V8_1_0'}
     xpaths = {
-    "A_vikt": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='61' and @termid='5']/ns:Parvalcltn/ns:Parvalmaterial[@id='10' and @actval > '0']/@actval",
+    "A_vikt": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='61' and @termid='5']/ns:Parvalcltn/ns:Parvalmaterial[@id='10' and @actval > '2']/@actval",
     "IIISusp_V_Innan_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='5' and @termid='48']/ns:Parvalcltn/ns:Parvalfloat[@id='22' and @actval > '2']/@actval",
     "IIISusp_V_Efter_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='5' and @termid='31']/ns:Parvalcltn/ns:Parvalfloat[@id='22' and @actval > '2']/@actval",
     "VIExtr_V_add_IIISusp_Efter": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='8' and @termid='1']/ns:Parvalcltn/ns:Parvalfloat[@id='2' and @actval > '2']/@actval",
@@ -128,20 +130,26 @@ def main():
     "VIIIFallning_V_Efter_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='1' and @termid='45']/ns:Parvalcltn/ns:Parvalfloat[@id='22' and @actval > '2']/@actval",
     "XIVFallning_V_Innan_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='30' and @termid='13']/ns:Parvalcltn/ns:Parvalfloat[@id='22' and @actval > '2']/@actval",
     "XIVFallning_V_Innan_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='30' and @termid='18']/ns:Parvalcltn/ns:Parvalfloat[@id='22' and @actval > '2']/@actval",
-    "IIISusp_pH_Innan_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='5' and @termid='9']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '0']/@actval",
-    "IIISusp_pH_Efter_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='5' and @termid='29']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '0']/@actval",
-    "VIExtr_pH_Innan_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='153']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '0']/@actval",
-    "VIExtr_pH_Efter_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='79']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '0']/@actval",
-    "VIIIFallning_pH_Innan_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='1' and @termid='39']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '0']/@actval",
-    "VIIIFallning_pH_Efter_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='1' and @termid='6']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '0' and @actval < '7']/@actval",
-    "XIVFallning_pH_Innan_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='30' and @termid='95']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '7']/@actval",
-    "XIVFallning_pH_Efter_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='30' and @termid='25']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '7']/@actval"
+    "IIISusp_pH_Innan_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='5' and @termid='9']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '2']/@actval",
+    "IIISusp_pH_Efter_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='5' and @termid='29']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '2']/@actval",
+    "VIExtr_pH_Innan_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='153']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '2']/@actval",
+    "VIExtr_pH_Efter_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='79']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '2']/@actval",
+    "VIIIFallning_pH_Innan_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='1' and @termid='39']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '2']/@actval",
+    "VIIIFallning_pH_Efter_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='1' and @termid='6']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '2' and @actval < '7']/@actval",
+    "XIVFallning_pH_Innan_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='30' and @termid='95']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '2']/@actval",
+    "XIVFallning_pH_Efter_pHjust": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='30' and @termid='25']/ns:Parvalcltn/ns:Parvalfloat[@id='14' and @actval > '2']/@actval"
     }
-
     with ThreadPoolExecutor() as executor:
-        results = list(executor.map(lambda file: processor.process(file, xpaths, namespaces), filenames))
+        results = list(executor.map(lambda file: processor.process(file, xpaths, namespaces), filtered_files))
+    
+    first_col = 'File'
+    xpath_key = list(xpaths.keys())
+    column_names = [first_col] + xpath_key
 
-    print(results)
+    df = pd.DataFrame(results, columns=column_names)
+    df['Batch_Number'] = batch_numbers
+    df = df.dropna(subset=['Batch_Number', 'A_vikt', 'File'])
+    print(df)
 
 if __name__ == "__main__":
     main()
