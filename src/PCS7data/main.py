@@ -148,7 +148,7 @@ def main():
 
     df = pd.DataFrame(results, columns=column_names)
     df['Batch_Number'] = batch_numbers
-    df = df.dropna(subset=['Batch_Number', 'A_vikt', 'File'])
+    df = df.dropna(subset=['Batch_Number', 'A_vikt', 'File', ])
     print(df)
 
 if __name__ == "__main__":
