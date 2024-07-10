@@ -46,7 +46,7 @@ class DataProcessor:
         ]
         return str(list(set(lst))[-1]).split() if len(set(lst)) == 1 else None    
 
-    def time_diff_(self, row):
+    def _time_diff(self, row):
         if pd.isnull(row['Start_time']) or pd.isnull(row['End_time']):
             return None
         else:
@@ -72,7 +72,7 @@ class DataProcessor:
                 'File': files,
         }
         df = pd.DataFrame(dict_time)
-        df[['Difference', 'Total_Seconds']] = df.apply(self.time_diff_, axis=1)
+        df[['Difference', 'Total_Seconds']] = df.apply(self._time_diff, axis=1)
         df = df.dropna(subset=['Start_time', 'End_time', 'Batch_number'])
         df = df[['Batch_number', 'Difference', 'Start_time', 'End_time', 'File', 'Total_Seconds']]  
         return df
