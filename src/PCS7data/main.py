@@ -7,7 +7,7 @@ from data_processor import DataProcessor
 
 def main():
     path = os.getenv("MY_PATH")
-    #path = '/mnt/c/Users/se1irar/Downloads/Archive/'
+    path = '/mnt/c/Users/se1irar/Downloads/Archive/'
     processor = DataProcessor(path)
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
@@ -26,6 +26,7 @@ def main():
     namespaces = {'ns': 'SIMATIC_BATCH_V8_1_0'}
     xpaths_654 = {
             "ing_batch": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='48']/ns:Parvalcltn/ns:Parvalstring[@id='30']/@actval",
+
     }
 
     with ThreadPoolExecutor() as executor:
@@ -34,15 +35,24 @@ def main():
     ingaende_batch = [result[1] for result in results_654]
 
     includes = ["656"]
+    includes2 = ["657"]
     excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "516", "MIN", "CIP", "654", "GRF", "GRT", "ALF", "ALT", ]
 
     filtered_files_656 = fetcher.fetcher(filenames, start_number, end_number, includes, excludes)
+    filtered_files_657 = fetcher.fetcher(filenames, start_number, end_number, includes2, excludes)
 
     with ThreadPoolExecutor() as executor:
         batch_numbers_656 = list(executor.map(processor.extract_batch_number, filtered_files_656))
 
+    with ThreadPoolExecutor() as executor:
+        batch_numbers_657 = list(executor.map(processor.extract_batch_number, filtered_files_657))
+
+    filtered_files_656 += filtered_files_657
+    batch_numbers_656 += batch_numbers_657
+
     ing_df = pd.DataFrame(ingaende_batch, columns=['batch_number'])
     ing_df['batch_654'] = batch_numbers_654
+    ing_df['filenames_654'] = filtered_files_654
     d = {
             'filenames': filtered_files_656,
             'batch_number': batch_numbers_656,
@@ -52,9 +62,46 @@ def main():
     merged_df = pd.merge(ing_df, df, on='batch_number', how='inner')
     print(merged_df)
 
-    files_654_656 = merged_df['filenames'].tolist()
+    files_merge_654 = merged_df['filenames_654'].tolist()
+    files_ing_batches_656 = merged_df['filenames'].tolist()
     batch_number_ing = merged_df['batch_number'].tolist()
     batch_number = merged_df['batch_654'].tolist()
+
+    xpath_656ing = {
+            "For_Konc_Innan_WT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='6' and @termid='4']/ns:Parvalcltn/ns:Parvalfloat[@id='32' and @actval > '2']/@actval",
+            "For_Konc_Innan_TT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='6' and @termid='4']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+            "For_Konc_Efter_WT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='6' and @termid='5']/ns:Parvalcltn/ns:Parvalfloat[@id='32' and @actval > '2']/@actval",
+            "For_Konc_Efter_TT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='6' and @termid='5']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+            "For_Konc_Abs": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='6' and @termid='1']/ns:Parvalcltn/ns:Parvalfloat[@id='44' and not (number(@actval) = 0)]/@actval",
+            "Dia_NaCl_Innan_WT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='13' and @termid='9']/ns:Parvalcltn/ns:Parvalfloat[@id='32' and @actval > '2']/@actval",
+            "Dia_NaCl_Innan_TT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='13' and @termid='9']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+            "Dia_NaCl_Efter_WT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='13' and @termid='15']/ns:Parvalcltn/ns:Parvalfloat[@id='32' and @actval > '2']/@actval",
+            "Dia_NaCl_Efter_TT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='13' and @termid='15']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+            "Dia_NaCl_Sats_Vol": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='13' and @termid='4']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+            "Dia_NaCl_Abs": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='13' and @termid='8']/ns:Parvalcltn/ns:Parvalfloat[@id='7' and not (number(@actval) = 0)]/@actval",
+            "Dia_WFI_Innan_WT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='12' and @termid='14']/ns:Parvalcltn/ns:Parvalfloat[@id='32' and @actval > '2']/@actval",
+            "Dia_WFI_Innan_TT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='12' and @termid='14']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+            "Dia_WFI_Efter_WT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='12' and @termid='16']/ns:Parvalcltn/ns:Parvalfloat[@id='32' and @actval > '2']/@actval",
+            "Dia_WFI_Efter_TT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='12' and @termid='16']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+            "Dia_WFI_Sats_Vol": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='12' and @termid='4']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+            "Dia_WFI_Abs": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='12' and @termid='8']/ns:Parvalcltn/ns:Parvalfloat[@id='7' and not (number(@actval) = 0)]/@actval",
+            "Konc_Innan_WT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='7' and @termid='1']/ns:Parvalcltn/ns:Parvalfloat[@id='32' and @actval > '2']/@actval",
+            "Konc_Innan_TT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='7' and @termid='1']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+            "Konc_Efter_WT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='7' and @termid='9']/ns:Parvalcltn/ns:Parvalfloat[@id='32' and @actval > '2']/@actval",
+            "Konc_Efter_TT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='7' and @termid='9']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+            "Konc_Abs": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='7' and @termid='31']/ns:Parvalcltn/ns:Parvalfloat[@id='44' and not (number(@actval) = 0)]/@actval",
+            "Konc_Abs_Eluering": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='7' and @termid='3']/ns:Parvalcltn/ns:Parvalfloat[@id='44' and not (number(@actval) = 0)]/@actval",
+            "Just_Slutvikt_Innan_WT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='9' and @termid='43']/ns:Parvalcltn/ns:Parvalfloat[@id='32' and @actval > '2']/@actval",
+            "Just_Slutvikt_Innan_TT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='9' and @termid='43']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+            "Just_Slutvikt_Efter_WT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='9' and @termid='25']/ns:Parvalcltn/ns:Parvalfloat[@id='32' and @actval > '2']/@actval",
+            "Just_Slutvikt_Efter_TT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='9' and @termid='25']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+
+    }
+
+    with ThreadPoolExecutor() as executor:
+        results_anna = list(executor.map(lambda file: processor.process(file, xpath_656ing, namespaces), files_ing_batches_656))
+    print(results_anna)
+
 
 if __name__ == "__main__":
     main()
