@@ -6,8 +6,8 @@ from data_processor import DataProcessor
 
 
 def main():
-    path = os.getenv("MY_PATH")
     path = '/mnt/c/Users/se1irar/Downloads/Archive/'
+    path = os.getenv("MY_PATH")
     processor = DataProcessor(path)
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
@@ -28,10 +28,17 @@ def main():
             "ing_batch": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='48']/ns:Parvalcltn/ns:Parvalstring[@id='30']/@actval",
 
     }
+    
+    xpath_654_old = {
+            "ing_batch": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='3']/ns:Parvalcltn/ns:Parvalstring[@id='30']/@actval",
+    }
 
+    with ThreadPoolExecutor() as executor:
+        results_654_old = list(executor.map(lambda file: processor.process(file, xpath_654_old, namespaces), filtered_files_654))
     with ThreadPoolExecutor() as executor:
         results_654 = list(executor.map(lambda file: processor.process(file, xpaths_654, namespaces), filtered_files_654))
 
+    ingaende_batch_old = [result_old[1] for result_old in results_654_old]
     ingaende_batch = [result[1] for result in results_654]
 
     includes = ["656"]
@@ -53,13 +60,20 @@ def main():
     ing_df = pd.DataFrame(ingaende_batch, columns=['batch_number'])
     ing_df['batch_654'] = batch_numbers_654
     ing_df['filenames_654'] = filtered_files_654
+
+    ing_df_old = pd.DataFrame(ingaende_batch_old, columns=['batch_number'])
+    ing_df_old['batch_654'] = batch_numbers_654
+    ing_df_old['filenames_654'] = filtered_files_654
+
+    combined_ing_df = pd.concat([ing_df, ing_df_old]).drop_duplicates(subset=['batch_number', 'batch_654'])
+
     d = {
             'filenames': filtered_files_656,
             'batch_number': batch_numbers_656,
     }
     df = pd.DataFrame(d)
 
-    merged_df = pd.merge(ing_df, df, on='batch_number', how='inner')
+    merged_df = pd.merge(combined_ing_df, df, on='batch_number', how='inner')
     print(merged_df)
 
     files_merge_654 = merged_df['filenames_654'].tolist()
@@ -98,10 +112,19 @@ def main():
 
     }
 
-    with ThreadPoolExecutor() as executor:
-        results_anna = list(executor.map(lambda file: processor.process(file, xpath_656ing, namespaces), files_ing_batches_656))
-    print(results_anna)
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        results_656 = list(executor.map(lambda file: processor.process(file, xpath_656ing, namespaces), files_ing_batches_656))
 
+
+    first_col = 'Filename'
+    xpath_key = list(xpath_656ing.keys())
+    column_names = [first_col] + xpath_key
+    
+    df = pd.DataFrame(results_656, columns=column_names)
+    df['batch_number'] = batch_number
+    df ['batch_number_ing'] = batch_number_ing
+    df['File_654'] = files_merge_654
+    print(df)
 
 if __name__ == "__main__":
     main()

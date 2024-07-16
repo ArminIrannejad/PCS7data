@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from lxml import etree
 from concurrent.futures import ThreadPoolExecutor
@@ -19,7 +20,7 @@ class DataProcessor:
 
     def process(self, file, xpaths, namespaces):
         results = [file]
-        file_path = fr'{self.path}/{file}'
+        file_path = os.path.join(self.path, file)         
         tree = etree.parse(file_path)
         root = tree.getroot()
         for xpath in xpaths.values():
