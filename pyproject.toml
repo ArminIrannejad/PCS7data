@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "PCS7data"
-version = "0.2.6"
+version = "0.2.7"
 description = "PCS7 Data Fetching, XML Archive"
 authors  = ["ArminIrannejad <armin.irannejad@gmail.com>"]
 readme = "README.md"
