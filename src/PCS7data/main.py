@@ -6,14 +6,14 @@ from data_processor import DataProcessor
 
 
 def main():
-    path = '/mnt/c/Users/se1irar/Downloads/Archive/'
     path = os.getenv("MY_PATH")
+    path = '/mnt/c/Users/se1irar/Downloads/Archive/'
     processor = DataProcessor(path)
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
 
     start_number = 000
-    end_number = 500 
+    end_number = 999 
     includes = ["654"]
     excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "516", "MIN", "CIP", "656", "GRF", "GRT", "ALF", "ALT",]
 
@@ -34,9 +34,9 @@ def main():
     }
 
     with ThreadPoolExecutor() as executor:
-        results_654_old = list(executor.map(lambda file: processor.process(file, xpath_654_old, namespaces), filtered_files_654))
+        results_654_old = list(executor.map(lambda file: processor.process(file, xpath_654_old, namespaces, 'last'), filtered_files_654))
     with ThreadPoolExecutor() as executor:
-        results_654 = list(executor.map(lambda file: processor.process(file, xpaths_654, namespaces), filtered_files_654))
+        results_654 = list(executor.map(lambda file: processor.process(file, xpaths_654, namespaces, 'last'), filtered_files_654))
 
     ingaende_batch_old = [result_old[1] for result_old in results_654_old]
     ingaende_batch = [result[1] for result in results_654]
@@ -113,18 +113,20 @@ def main():
     }
 
     with ThreadPoolExecutor(max_workers=4) as executor:
-        results_656 = list(executor.map(lambda file: processor.process(file, xpath_656ing, namespaces), files_ing_batches_656))
+        results_656 = list(executor.map(lambda file: processor.process(file, xpath_656ing, namespaces, 'last'), files_ing_batches_656))
 
 
-    first_col = 'Filename'
+    first_col = 'Filename_656'
     xpath_key = list(xpath_656ing.keys())
     column_names = [first_col] + xpath_key
     
     df = pd.DataFrame(results_656, columns=column_names)
     df['batch_number'] = batch_number
-    df ['batch_number_ing'] = batch_number_ing
-    df['File_654'] = files_merge_654
-    print(df)
+    df ['batch_number_ingaende'] = batch_number_ing
+    df['Filename_654'] = files_merge_654
+    df.dropna(subset=['For_Konc_Innan_WT1'])
+
+    df.to_excel('~/Downloads/Anna_Data_fake.xlsx', index=False)
 
 if __name__ == "__main__":
     main()

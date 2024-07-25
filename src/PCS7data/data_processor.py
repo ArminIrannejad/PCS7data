@@ -18,16 +18,22 @@ class DataProcessor:
             return result
         return None
 
-    def process(self, file, xpaths, namespaces):
+    def process(self, file, xpaths, namespaces, result_type = 'full'):
         results = [file]
-        file_path = os.path.join(self.path, file)         
+        file_path = os.path.join(self.path, file)       
         tree = etree.parse(file_path)
         root = tree.getroot()
         for xpath in xpaths.values():
             parvalfloats = root.xpath(xpath, namespaces=namespaces)
             if parvalfloats:
                 lst = [parvalfloat for parvalfloat in parvalfloats]
-                results.append(str(list(set(lst))[-1]))
+                unique_lst = list(set(lst))
+                if result_type == 'first':
+                    results.append(str(unique_lst[0]))
+                elif result_type == 'last':
+                    results.append(str(unique_lst[-1]))
+                else:
+                    results.append(str(unique_lst))
             else:
                 results.append(None)
         return results
@@ -77,4 +83,7 @@ class DataProcessor:
         df = df.dropna(subset=['Start_time', 'End_time', 'Batch_number'])
         df = df[['Batch_number', 'Difference', 'Start_time', 'End_time', 'File', 'Total_Seconds']]  
         return df
+
+    def time_for_block(self, xpath):
+        pass
 
