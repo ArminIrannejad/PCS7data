@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.0 (2024-07-25)
+
+### Feature
+
+* First, last and full ([`1ec187f`](https://github.com/ArminIrannejad/PCS7data/commit/1ec187f11ea6eb4993c2d8c8dd3c78acd385cda3))
+
 ## v0.2.7 (2024-07-16)
 
 
