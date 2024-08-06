@@ -4,7 +4,6 @@ from concurrent.futures import ThreadPoolExecutor
 from data_fetcher import DataFetcher
 from data_processor import DataProcessor
 
-
 def main():
     path = os.getenv("MY_PATH")
     path = '/mnt/c/Users/se1irar/Downloads/Archive/'
@@ -26,7 +25,6 @@ def main():
     namespaces = {'ns': 'SIMATIC_BATCH_V8_1_0'}
     xpaths_654 = {
             "ing_batch": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='48']/ns:Parvalcltn/ns:Parvalstring[@id='30']/@actval",
-
     }
     
     xpath_654_old = {
@@ -109,12 +107,32 @@ def main():
             "Just_Slutvikt_Innan_TT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='9' and @termid='43']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
             "Just_Slutvikt_Efter_WT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='9' and @termid='25']/ns:Parvalcltn/ns:Parvalfloat[@id='32' and @actval > '2']/@actval",
             "Just_Slutvikt_Efter_TT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='9' and @termid='25']/ns:Parvalcltn/ns:Parvalfloat[@id='34' and @actval > '2']/@actval",
+    }
+
+    xpath_654_times = {
+            "Omrörningsstart": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='3']/@timestamp",
+            "WFI_Tillsats": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='14']/@timestamp",
+            "NaCl_Tillsats": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='3' and @termid='1']/@timestamp",
+            "WFI_till_WDS2": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='8']/@timestamp",
+            "Filtr_NaclBufftill5%": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='63']/@timestamp",
 
     }
 
+    xpath_654_times_old = {
+            "Omrörningsstart": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='' and @termid='3']/@timestamp",
+            "WFI_Tillsats": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='14']/@timestamp",
+            "NaCl_Tillsats": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='3' and @termid='1']/@timestamp",
+            "WFI_till_WDS2": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='8']/@timestamp",
+            "Filtr_NaclBufftill5%": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='63']/@timestamp",
+
+    }
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results_654_time = list(executor.map(lambda file: processor.process(file, xpath_654_times, namespaces, 'full'), files_merge_654))
+    print(results_654_time)
+    
     with ThreadPoolExecutor(max_workers=4) as executor:
         results_656 = list(executor.map(lambda file: processor.process(file, xpath_656ing, namespaces, 'last'), files_ing_batches_656))
-
 
     first_col = 'Filename_656'
     xpath_key = list(xpath_656ing.keys())
@@ -124,7 +142,7 @@ def main():
     df['batch_number'] = batch_number
     df ['batch_number_ingaende'] = batch_number_ing
     df['Filename_654'] = files_merge_654
-    df.dropna(subset=['For_Konc_Innan_WT1'])
+    df.dropna(subset=['For_Konc_Innan_WT1', 'Dia_NaCl_Innan_TT1'])
 
     df.to_excel('~/Downloads/Anna_Data_fake.xlsx', index=False)
 
