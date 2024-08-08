@@ -17,6 +17,7 @@ def main():
     excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "516", "MIN", "CIP", "656", "GRF", "GRT", "ALF", "ALT",]
 
     filtered_files_654 = fetcher.fetcher(filenames, start_number, end_number, includes, excludes)
+    filtered_files_new = fetcher.fetcher(filenames, 150, 500, includes, excludes)
 
     with ThreadPoolExecutor() as executor:
         batch_numbers_654 = list(executor.map(processor.extract_batch_number, filtered_files_654))
@@ -69,15 +70,16 @@ def main():
             'filenames': filtered_files_656,
             'batch_number': batch_numbers_656,
     }
-    df = pd.DataFrame(d)
+    df_temp = pd.DataFrame(d)
 
-    merged_df = pd.merge(combined_ing_df, df, on='batch_number', how='inner')
+    merged_df = pd.merge(combined_ing_df, df_temp, on='batch_number', how='inner')
     print(merged_df)
 
     files_merge_654 = merged_df['filenames_654'].tolist()
     files_ing_batches_656 = merged_df['filenames'].tolist()
     batch_number_ing = merged_df['batch_number'].tolist()
     batch_number = merged_df['batch_654'].tolist()
+    files_merge_654_new = [i for i in filtered_files_new if i in files_merge_654]
 
     xpath_656ing = {
             "For_Konc_Innan_WT1": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='6' and @termid='4']/ns:Parvalcltn/ns:Parvalfloat[@id='32' and @actval > '2']/@actval",
@@ -110,7 +112,7 @@ def main():
     }
 
     xpath_654_times = {
-            "Omrörningsstart": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='3']/@timestamp",
+            "Omrörning": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='3']/@timestamp",
             "WFI_Tillsats": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='14']/@timestamp",
             "NaCl_Tillsats": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='3' and @termid='1']/@timestamp",
             "WFI_till_WDS2": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='8']/@timestamp",
@@ -118,21 +120,25 @@ def main():
 
     }
 
-    xpath_654_times_old = {
-            "Omrörningsstart": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='' and @termid='3']/@timestamp",
-            "WFI_Tillsats": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='14']/@timestamp",
-            "NaCl_Tillsats": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='3' and @termid='1']/@timestamp",
-            "WFI_till_WDS2": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='8']/@timestamp",
-            "Filtr_NaclBufftill5%": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='63']/@timestamp",
-
-    }
-
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        results_654_time = list(executor.map(lambda file: processor.process(file, xpath_654_times, namespaces, 'full'), files_merge_654))
-    print(results_654_time)
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        results_654_time = list(executor.map(lambda file: processor.process(file, xpath_654_times, namespaces, 'full'), files_merge_654_new))
     
     with ThreadPoolExecutor(max_workers=4) as executor:
         results_656 = list(executor.map(lambda file: processor.process(file, xpath_656ing, namespaces, 'last'), files_ing_batches_656))
+
+    timestamp_lists = []
+
+    for entry in results_654_time:
+        for time_lst in entry[1:]:
+            timestamp_lists.append(time_lst)
+
+    difference = list(map(processor.time_difference, timestamp_lists))
+    reshaped_time_diffs = [difference[i:i+5] for i in range(0, len(difference), 5)]
+    column_names = list(xpath_654_times.keys())
+    df_time_diffs = pd.DataFrame(reshaped_time_diffs, columns=column_names)
+    df_time_diffs['Filename_654'] = files_merge_654_new
+    df_time_diffs.dropna()
+    print(df_time_diffs)
 
     first_col = 'Filename_656'
     xpath_key = list(xpath_656ing.keys())
@@ -144,7 +150,8 @@ def main():
     df['Filename_654'] = files_merge_654
     df.dropna(subset=['For_Konc_Innan_WT1', 'Dia_NaCl_Innan_TT1'])
 
-    df.to_excel('~/Downloads/Anna_Data_fake.xlsx', index=False)
+    final_df = pd.merge(df, df_time_diffs, on='Filename_654', how='left')
+    final_df.to_excel('~/Downloads/Anna_Data_fake.xlsx', index=False)
 
 if __name__ == "__main__":
     main()

@@ -33,7 +33,7 @@ class DataProcessor:
                 elif result_type == 'last':
                     results.append(str(unique_lst[-1]))
                 else:
-                    results.append(str(unique_lst))
+                    results.append((unique_lst))
             else:
                 results.append(None)
         return results
@@ -47,10 +47,7 @@ class DataProcessor:
         parvalfloats = root.xpath(xpath, namespaces=namespaces)
         if not parvalfloats:
             return None
-        lst = [
-        f"{parvalfloat.get('actstart')} {parvalfloat.get('actend')}"
-        for parvalfloat in parvalfloats
-        ]
+        lst = [f"{parvalfloat.get('actstart')} {parvalfloat.get('actend')}" for parvalfloat in parvalfloats]
         return str(list(set(lst))[-1]).split() if len(set(lst)) == 1 else None    
 
     def _time_diff(self, row):
@@ -84,6 +81,17 @@ class DataProcessor:
         df = df[['Batch_number', 'Difference', 'Start_time', 'End_time', 'File', 'Total_Seconds']]  
         return df
 
-    def time_for_block(self, xpath):
-        pass
+    def time_difference(self, timestamp_lst):
+        if timestamp_lst is None:
+            return None
+        dt_obj = [datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in timestamp_lst]
+        start = min(dt_obj)
+        end = max(dt_obj)
+        diff = end - start
+        total_seconds = int(diff.total_seconds())
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+        diff_str = f"{hours:02}:{minutes:02}:{seconds:02}"
+        return diff_str
 
