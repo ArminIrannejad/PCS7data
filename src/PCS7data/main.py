@@ -6,8 +6,8 @@ from data_processor import DataProcessor
 from datetime import datetime
 
 def main():
-    path = os.getenv("MY_PATH")
     path = '/mnt/c/Users/se1irar/Downloads/Archive/'
+    path = os.getenv("MY_PATH")
     processor = DataProcessor(path)
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
@@ -132,14 +132,14 @@ def main():
 
     results_654_time_filtr = list(map(lambda file: processor.process(file, xpath_654_filtr_times, namespaces, 'full'), files_merge_654_new))
 
+    print(results_654_time_filtr)
     difference = [[processor.time_difference(timestamps) for timestamps in row] for row in results_654_time]
-    start_filtr = [[timestamps[0] for timestamps in row] for row in results_654_time_filtr]
-    end_filtr = [[timestamps[1] for timestamps in row] for row in results_654_time_filtr]
-    print(start_filtr)
+    start_filtr = [timestamps[0] for timestamps in results_654_time_filtr] 
+    end_filtr = [timestamps[1] for timestamps in results_654_time_filtr] 
     comb_filtr_times = [
             [
-                min(datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in start_times), 
-                max(datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in end_times)
+                min([datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in start_times]), 
+                max([datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in end_times])
             ]
             for start_times, end_times in zip(start_filtr, end_filtr)
     ]
@@ -150,7 +150,6 @@ def main():
     ]
     for start, end in comb_filtr_times
     ]
-    #print(comb_filtr_times_str)
     
     difference_filtr = [processor.time_difference(times) for times in comb_filtr_times_str]
     column_names = list(xpath_654_times.keys())
