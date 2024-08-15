@@ -3,6 +3,7 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from data_fetcher import DataFetcher
 from data_processor import DataProcessor
+from datetime import datetime
 
 def main():
     path = os.getenv("MY_PATH")
@@ -33,12 +34,9 @@ def main():
     }
 
     with ThreadPoolExecutor() as executor:
-        results_654_old = list(executor.map(lambda file: processor.process(file, xpath_654_old, namespaces, 'last'), filtered_files_654))
+        ingaende_batch_old = list(executor.map(lambda file: processor.process(file, xpath_654_old, namespaces, 'last'), filtered_files_654))
     with ThreadPoolExecutor() as executor:
-        results_654 = list(executor.map(lambda file: processor.process(file, xpaths_654, namespaces, 'last'), filtered_files_654))
-
-    ingaende_batch_old = [result_old[1] for result_old in results_654_old]
-    ingaende_batch = [result[1] for result in results_654]
+        ingaende_batch = list(executor.map(lambda file: processor.process(file, xpaths_654, namespaces, 'last'), filtered_files_654))
 
     includes = ["656"]
     includes2 = ["657"]
@@ -120,37 +118,59 @@ def main():
 
     }
 
+    xpath_654_filtr_times = {
+            "Filtr_10%_Alb_start": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='58']/@timestamp",
+            "Filtr_10%_Alb_end": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='74']/@timestamp",
+
+    }
+
     with ThreadPoolExecutor(max_workers=4) as executor:
         results_654_time = list(executor.map(lambda file: processor.process(file, xpath_654_times, namespaces, 'full'), files_merge_654_new))
     
     with ThreadPoolExecutor(max_workers=4) as executor:
         results_656 = list(executor.map(lambda file: processor.process(file, xpath_656ing, namespaces, 'last'), files_ing_batches_656))
 
-    timestamp_lists = []
+    results_654_time_filtr = list(map(lambda file: processor.process(file, xpath_654_filtr_times, namespaces, 'full'), files_merge_654_new))
 
-    for entry in results_654_time:
-        for time_lst in entry[1:]:
-            timestamp_lists.append(time_lst)
-
-    difference = list(map(processor.time_difference, timestamp_lists))
-    reshaped_time_diffs = [difference[i:i+5] for i in range(0, len(difference), 5)]
+    difference = [[processor.time_difference(timestamps) for timestamps in row] for row in results_654_time]
+    start_filtr = [[timestamps[0] for timestamps in row] for row in results_654_time_filtr]
+    end_filtr = [[timestamps[1] for timestamps in row] for row in results_654_time_filtr]
+    print(start_filtr)
+    comb_filtr_times = [
+            [
+                min(datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in start_times), 
+                max(datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in end_times)
+            ]
+            for start_times, end_times in zip(start_filtr, end_filtr)
+    ]
+    comb_filtr_times_str = [
+    [
+        start.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+        end.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    ]
+    for start, end in comb_filtr_times
+    ]
+    #print(comb_filtr_times_str)
+    
+    difference_filtr = [processor.time_difference(times) for times in comb_filtr_times_str]
     column_names = list(xpath_654_times.keys())
-    df_time_diffs = pd.DataFrame(reshaped_time_diffs, columns=column_names)
+    df_time_diffs = pd.DataFrame(difference, columns=column_names)
     df_time_diffs['Filename_654'] = files_merge_654_new
+    df_time_diffs['Filtr_10%_Alb'] = difference_filtr
     df_time_diffs.dropna()
     print(df_time_diffs)
 
-    first_col = 'Filename_656'
-    xpath_key = list(xpath_656ing.keys())
-    column_names = [first_col] + xpath_key
+    column_names = list(xpath_656ing.keys())
     
     df = pd.DataFrame(results_656, columns=column_names)
     df['batch_number'] = batch_number
     df ['batch_number_ingaende'] = batch_number_ing
     df['Filename_654'] = files_merge_654
+    df['Filename_ingaende'] = files_ing_batches_656
     df.dropna(subset=['For_Konc_Innan_WT1', 'Dia_NaCl_Innan_TT1'])
 
     final_df = pd.merge(df, df_time_diffs, on='Filename_654', how='left')
+
     final_df.to_excel('~/Downloads/Anna_Data_fake.xlsx', index=False)
 
 if __name__ == "__main__":

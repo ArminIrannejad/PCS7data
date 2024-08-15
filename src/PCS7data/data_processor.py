@@ -19,7 +19,7 @@ class DataProcessor:
         return None
 
     def process(self, file, xpaths, namespaces, result_type = 'full'):
-        results = [file]
+        results = []
         file_path = os.path.join(self.path, file)       
         tree = etree.parse(file_path)
         root = tree.getroot()
