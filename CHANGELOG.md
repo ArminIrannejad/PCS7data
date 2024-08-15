@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.4 (2024-08-15)
+
+### Fix
+
+* Fixed mix of start and end time ([`cce1445`](https://github.com/ArminIrannejad/PCS7data/commit/cce1445268f11c84ffcfba1c11d878b396eb3a83))
+
 ## v0.3.3 (2024-08-15)
 
 
