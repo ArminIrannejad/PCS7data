@@ -132,21 +132,20 @@ def main():
 
     results_654_time_filtr = list(map(lambda file: processor.process(file, xpath_654_filtr_times, namespaces, 'full'), files_merge_654_new))
 
-    print(results_654_time_filtr)
     difference = [[processor.time_difference(timestamps) for timestamps in row] for row in results_654_time]
     start_filtr = [timestamps[0] for timestamps in results_654_time_filtr] 
     end_filtr = [timestamps[1] for timestamps in results_654_time_filtr] 
     comb_filtr_times = [
             [
-                min([datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in start_times]), 
-                max([datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in end_times])
+                min([datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in start_times]) if start_times else None, 
+                max([datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in end_times]) if end_times else None
             ]
             for start_times, end_times in zip(start_filtr, end_filtr)
     ]
     comb_filtr_times_str = [
     [
-        start.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
-        end.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        start.strftime("%Y-%m-%dT%H:%M:%S.%fZ") if start is not None else None,
+        end.strftime("%Y-%m-%dT%H:%M:%S.%fZ") if end is not None else None
     ]
     for start, end in comb_filtr_times
     ]
@@ -169,6 +168,7 @@ def main():
     df.dropna(subset=['For_Konc_Innan_WT1', 'Dia_NaCl_Innan_TT1'])
 
     final_df = pd.merge(df, df_time_diffs, on='Filename_654', how='left')
+    print(final_df)
 
     final_df.to_excel('~/Downloads/Anna_Data_fake.xlsx', index=False)
 
