@@ -82,7 +82,7 @@ class DataProcessor:
         return df
 
     def time_difference(self, timestamp_lst):
-        if timestamp_lst is None:
+        if None in timestamp_lst:
             return None
         dt_obj = [datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in timestamp_lst]
         start = min(dt_obj)
