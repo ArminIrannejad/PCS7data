@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.6 (2024-08-16)
+
+### Fix
+
+* Fixed/more robust error handling ([`2134dc6`](https://github.com/ArminIrannejad/PCS7data/commit/2134dc673a84489880acfe6f5ecad316ef1062e8))
+
 ## v0.3.5 (2024-08-16)
 
 
