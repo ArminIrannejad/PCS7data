@@ -6,8 +6,8 @@ from data_processor import DataProcessor
 from datetime import datetime
 
 def main():
-    path = '/mnt/c/Users/se1irar/Downloads/Archive/'
     path = os.getenv("MY_PATH")
+    path = '/mnt/c/Users/se1irar/Downloads/Archive/'
     processor = DataProcessor(path)
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
@@ -132,7 +132,7 @@ def main():
 
     results_654_time_filtr = list(map(lambda file: processor.process(file, xpath_654_filtr_times, namespaces, 'full'), files_merge_654_new))
 
-    difference = [[processor.time_difference(timestamps) for timestamps in row] for row in results_654_time]
+    difference = [[processor.time_difference(timestamps) if timestamps is not None else None for timestamps in row] for row in results_654_time]
     start_filtr = [timestamps[0] for timestamps in results_654_time_filtr] 
     end_filtr = [timestamps[1] for timestamps in results_654_time_filtr] 
     comb_filtr_times = [
@@ -150,7 +150,7 @@ def main():
     for start, end in comb_filtr_times
     ]
     
-    difference_filtr = [processor.time_difference(times) for times in comb_filtr_times_str]
+    difference_filtr = [processor.time_difference(times) if times is not None else None for times in comb_filtr_times_str]
     column_names = list(xpath_654_times.keys())
     df_time_diffs = pd.DataFrame(difference, columns=column_names)
     df_time_diffs['Filename_654'] = files_merge_654_new
