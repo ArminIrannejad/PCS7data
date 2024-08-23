@@ -38,9 +38,22 @@ def main():
 
     with ThreadPoolExecutor() as executor:
         result_time = list(executor.map(lambda file: processor.process(file, xpath_VBH, namespaces, 'full'), filtered_files_656))
-    print(result_time)
     
-    difference = [[processor.time_difference(timestamps) if timestamps is not None else None for timestamps in row] for row in result_time]
-    print(difference)
+    time_data = [[processor.time_difference(timestamps) if timestamps is not None else None for timestamps in row] for row in result_time]
+    difference = [timestamps[0] if timestamps is not None else None for row in time_data for timestamps in row]
+    start_times = [timestamps[1].strftime("%Y-%m-%dT%H:%M:%S.%fZ") if timestamps is not None else None for row in time_data for timestamps in row]
+    end_times = [timestamps[2].strftime("%Y-%m-%dT%H:%M:%S.%fZ") if timestamps is not None else None for row in time_data for timestamps in row]
+
+    df = pd.DataFrame({
+        'Batch_Number': batch_numbers_656,
+        'Start_time': start_times,
+        'End_time': end_times,
+        'Difference': difference,
+        'Filename': filtered_files_656,
+    })
+
+    df = df.dropna()
+    print(df)
+
 if __name__ == "__main__":
     main()
