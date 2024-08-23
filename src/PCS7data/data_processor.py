@@ -95,5 +95,5 @@ class DataProcessor:
         minutes = (total_seconds % 3600) // 60
         seconds = total_seconds % 60
         diff_str = f"{hours:02}:{minutes:02}:{seconds:02}"
-        return diff_str
+        return diff_str, start, end
 
