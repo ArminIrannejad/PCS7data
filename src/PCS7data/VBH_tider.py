@@ -22,8 +22,8 @@ def process_time_data_in_chunks(files, processor, xpath_VBH, namespaces, chunk_s
 def main():
     path = "C:/Users/se1irar/Downloads/Archive/"
     path = "Z:/Production/ALBFRII/BatchArchives_XML/"
-    output_path = "C:/Users/se1irar/Documents/Data/Albumin/"
-    output_path1 = "Z:/Public/Temp/se1irar/Data/Albumin/"
+    output_path = "C:/Users/se1irar/Documents/Data/Albumin/VBH_Tider.csv"
+    output_path1 = "Z:/Public/Temp/se1irar/Data/Albumin/VBH_Tider.csv"
 
     processor = DataProcessor(path)
     fetcher = DataFetcher(path)
