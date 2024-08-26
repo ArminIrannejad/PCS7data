@@ -29,7 +29,7 @@ def main():
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
 
-    start_number = 422
+    start_number = 400
     end_number = 450
     includes = ["656"]
     includes2 = ["657"]
