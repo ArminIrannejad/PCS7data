@@ -67,7 +67,7 @@ def main():
         'Start_time': start_times,
         'End_time': end_times,
         'Difference': difference,
-        'Filename': filtered_files_656,
+        'Filename': new_files,
     })
 
     df = df.dropna()
