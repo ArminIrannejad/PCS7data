@@ -75,7 +75,7 @@ def main():
 
     df['Start_time'] = pd.to_datetime(df['Start_time'])
     df['End_time'] = pd.to_datetime(df['End_time'])
-    df = df.sort_values(by='Start_time')
+    df = df.sort_values(by='Start_time', ascending=False)
 
     if os.path.exists(output_path):
         df.to_csv(output_path, mode='a', header=False, index=False)
