@@ -29,7 +29,7 @@ def main():
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
 
-    start_number = 400
+    start_number = 235
     end_number = 450
     includes = ["656"]
     includes2 = ["657"]
@@ -72,6 +72,11 @@ def main():
 
     df = df.dropna()
     print(df)
+
+    df['Start_time'] = pd.to_datetime(df['Start_time'])
+    df['End_time'] = pd.to_datetime(df['End_time'])
+    df = df.sort_values(by='Start_time')
+
     if os.path.exists(output_path):
         df.to_csv(output_path, mode='a', header=False, index=False)
         df.to_csv(output_path1, mode='a', header=False, index=False)
