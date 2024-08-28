@@ -29,8 +29,8 @@ def main():
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
 
-    start_number = 149
-    end_number = 450
+    start_number = 000
+    end_number = 999
     includes = ["656"]
     includes2 = ["657"]
     excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "516", "MIN", "CIP", "654", "GRF", "GRT", "ALF", "ALT"]
@@ -82,8 +82,12 @@ def main():
 
     df_sort = pd.read_csv(output_path1)
 
-    df_sort['Start_time'] = pd.to_datetime(df_sort['Start_time'])
+    df_sort['Start_time'] = pd.to_datetime(df_sort['Start_time'], format='mixed')
+    df_sort['End_time'] = pd.to_datetime(df_sort['End_time'], format='mixed')
     df_sort = df_sort.sort_values(by='Start_time', ascending=False)
+
+    df_sort['Start_time'] = df_sort['Start_time'].dt.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    df_sort['End_time'] = df_sort['End_time'].dt.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
     df_sort.to_csv(output_path1, index=False)
 
