@@ -5,7 +5,7 @@ from data_fetcher import DataFetcher
 from data_processor import DataProcessor
 from datetime import datetime
 
-def process_time_data_in_chunks(files, processor, xpath_VBH, namespaces, chunk_size=10):
+def process_chunks(files, processor, xpath_VBH, namespaces, chunk_size=10):
     time_data = []
     
     for i in range(0, len(files), chunk_size):
@@ -56,7 +56,7 @@ def main():
     }
 
     chunk_size = 20  
-    time_data = process_time_data_in_chunks(new_files, processor, xpath_VBH, namespaces, chunk_size)
+    time_data = process_chunks(new_files, processor, xpath_VBH, namespaces, chunk_size)
 
     difference = [timestamps[0] if timestamps is not None else None for row in time_data for timestamps in row]
     start_times = [timestamps[1].strftime("%Y-%m-%dT%H:%M:%S.%fZ") if timestamps is not None else None for row in time_data for timestamps in row]
@@ -71,7 +71,6 @@ def main():
     })
 
     df = df.dropna()
-    print(df)
 
     if os.path.exists(output_path):
         df.to_csv(output_path, mode='a', header=False, index=False)
