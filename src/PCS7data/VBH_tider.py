@@ -26,8 +26,8 @@ def main():
         output_path = "C:/Users/se1irar/Downloads/Data/Albumin/VBH_Tider.csv"
         output_path1 = "Z:/Public/Temp/se1irar/Data/Albumin/VBH_Tider.csv"
     else:
-        path = os.getenv("MY_PATH")
         path = "/mnt/c/Users/se1irar/Downloads/Archive/"
+        path = os.getenv("MY_PATH")
         output_path = "/mnt/c/Users/se1irar/Downloads/Data/Albumin/VBH_Tider.csv"
         output_path1 = "/mnt/z/Public/Temp/se1irar/Data/Albumin/VBH_Tider.csv"
 
