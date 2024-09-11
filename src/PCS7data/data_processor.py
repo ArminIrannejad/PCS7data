@@ -18,6 +18,26 @@ class DataProcessor:
             return result
         return None
 
+    def process_order(self, file, xpaths, namespaces, result_type = 'full'):
+        results = []
+        file_path = os.path.join(self.path, file)       
+        tree = etree.parse(file_path)
+        root = tree.getroot()
+        for xpath in xpaths.values():
+            parvalfloats = root.xpath(xpath, namespaces=namespaces)
+            if parvalfloats:
+                lst = [parvalfloat for parvalfloat in parvalfloats]
+                unique_lst = list(set(lst))
+                if result_type == 'first':
+                    results.append(str(unique_lst[0]))
+                elif result_type == 'last':
+                    results.append(str(unique_lst[-1]))
+                else:
+                    results.append((unique_lst))
+            else:
+                results.append(None)
+        return results
+
     def process(self, file, xpaths, namespaces, result_type = 'full'):
         results = []
         file_path = os.path.join(self.path, file)       
