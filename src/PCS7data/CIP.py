@@ -26,8 +26,8 @@ def main():
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
 
-    start_number = 400
-    end_number = 404
+    start_number = 409
+    end_number = 410
     includes = ["CIP", "516"]
     excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "MIN", "654", "ALF", "ALT", "656",]
 
@@ -41,18 +41,19 @@ def main():
             "data": "/ns:Archivebatch/ns:Cr/ns:Rp/ns:Sfcdesccltn/ns:Sfcdescflat/ns:Sfcand/ns:Sfcseq/ns:Sfcstep",
     }
 
-    chunk_size = 50
+    chunk_size = 10
     result = process_chunks(filtered_files, processor, xpath_batch, namespaces, chunk_size)
     # /Archivebatch/Cr/Rp/Sfcdesccltn/Sfcdescflat
-    sfcstep = result[0]
     paired = []
+    
 
-    for element in sfcstep[0]:
-        name = element.get('name')
-        contid = element.get('contid')
-        termid = element.get('termid')
-        
-        paired.append((name, contid, termid))
+    for sfcstep in result:
+        for element in sfcstep[0]:
+            name = element.get('name')
+            contid = element.get('contid')
+            termid = element.get('termid')
+            paired.append((name, contid, termid))
+
     for i, (name, contid, termid) in enumerate(paired):
         print(f"Index {i}: Name: {name}, ContID: {contid}, TermID: {termid}")
     
