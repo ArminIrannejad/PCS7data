@@ -18,23 +18,32 @@ class DataProcessor:
             return result
         return None
 
-    def process_order(self, file, xpaths, namespaces, result_type = 'full'):
+    def recipe_block_id(self, file, xpaths, namespaces, result_type='full'):
         results = []
-        file_path = os.path.join(self.path, file)       
+        file_path = os.path.join(self.path, file)
         tree = etree.parse(file_path)
         root = tree.getroot()
+        
         for xpath in xpaths.values():
-            parvalfloats = root.xpath(xpath, namespaces=namespaces)
-            if parvalfloats:
-                lst = [parvalfloat for parvalfloat in parvalfloats]
-                if result_type == 'first':
-                    results.append(str(lst[0]))
-                elif result_type == 'last':
-                    results.append(str(lst[-1]))
+            sfcands = root.xpath(xpath, namespaces=namespaces)
+            for sfcand in sfcands:
+                sfcsteps = sfcand.xpath("./ns:Sfcseq/ns:Sfcstep", namespaces=namespaces)
+                sfcsteps_data = []
+                for sfcstep in sfcsteps:
+                    contid = sfcstep.get("contid")
+                    termid = sfcstep.get("termid")
+                    name = sfcstep.get("name")
+                    sfcsteps_data.append((name, contid, termid))
+                
+                if sfcsteps_data:
+                    if result_type == 'first':
+                        results.append(sfcsteps_data[0])
+                    elif result_type == 'last':
+                        results.append(sfcsteps_data[-1])
+                    else:
+                        results.append(sfcsteps_data)
                 else:
-                    results.append((lst))
-            else:
-                results.append(None)
+                    results.append(None)
         return results
 
     def process(self, file, xpaths, namespaces, result_type = 'full'):
