@@ -18,7 +18,7 @@ class DataProcessor:
             return result
         return None
 
-    def recipe_block_id(self, file, xpaths, namespaces, result_type='full'):
+    def recipe_block_id(self, file, xpaths, namespaces):
         results = []
         file_path = os.path.join(self.path, file)
         tree = etree.parse(file_path)
@@ -36,11 +36,6 @@ class DataProcessor:
                     sfcsteps_data.append((name, contid, termid))
                 
                 if sfcsteps_data:
-                    if result_type == 'first':
-                        results.append(sfcsteps_data[0])
-                    elif result_type == 'last':
-                        results.append(sfcsteps_data[-1])
-                    else:
                         results.append(sfcsteps_data)
                 else:
                     results.append(None)

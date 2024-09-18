@@ -9,7 +9,7 @@ def process_chunks(files, processor, xpaths, namespaces, chunk_size=10):
     all_sfcands_data = []
     for i in range(0, len(files), chunk_size):
         chunk = files[i:i + chunk_size]
-        results = list(map(lambda file: processor.recipe_block_id(file, xpaths, namespaces, 'full'), chunk))
+        results = list(map(lambda file: processor.recipe_block_id(file, xpaths, namespaces), chunk))
         all_sfcands_data.extend(results)
     return all_sfcands_data
 
