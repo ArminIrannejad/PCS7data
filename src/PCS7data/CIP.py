@@ -25,8 +25,8 @@ def main():
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
 
-    start_number = 418
-    end_number = 418
+    start_number = 413
+    end_number = 413
     includes = ["CIP", "516"]
     excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "MIN", "654", "ALF", "ALT", "656"]
 
@@ -42,8 +42,10 @@ def main():
 
     chunk_size = 10
     result = process_chunks(filtered_files, processor, xpath_batch, namespaces, chunk_size)
+    column = ['Filename', 'Sfcand1', 'Sfcand2', 'Sfcand3', 'Sfcand4', 'Sfcand5', 'Sfcand6', 'Sfcand7', 'Sfcand8']
     
-    print(result)
+    df = pd.DataFrame(result, columns=column)
+    print(df['Sfcand1'])
 if __name__ == "__main__":
     main()
 

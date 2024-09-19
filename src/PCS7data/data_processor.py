@@ -19,7 +19,7 @@ class DataProcessor:
         return None
 
     def recipe_block_id(self, file, xpaths, namespaces):
-        results = []
+        results = [file]
         file_path = os.path.join(self.path, file)
         tree = etree.parse(file_path)
         root = tree.getroot()
