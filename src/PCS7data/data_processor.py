@@ -126,5 +126,16 @@ class DataProcessor:
     def time_difference_unix(self, timestamp_lst):
         if None in timestamp_lst or timestamp_lst is None:
             return None
-        unix_time = np.array([datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp() for ts in timestamp_lst], dtype=float64)
+        unix_time = np.array([datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp() for ts in timestamp_lst], dtype=np.float64)
+        start = np.min(unix_time)
+        end = np.max(unix_time)
+        total_seconds = end - start
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+        diff_str = f"{hours:02}:{minutes:02}:{seconds:02}" 
+        #TODO convert back to ISO8601, millisecond precision?
+        return diff_str, start, end
+
+
 
