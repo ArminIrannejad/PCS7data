@@ -18,16 +18,16 @@ def main():
         path = "C:/Users/se1irar/Downloads/Archive/"
         path = "Z:/Production/ALBFRII/BatchArchives_XML/"
     else:
-        path = os.getenv("MY_PATH")
         path = "/mnt/c/Users/se1irar/Downloads/Archive/"
+        path = os.getenv("MY_PATH")
 
     processor = DataProcessor(path)
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
 
-    start_number = 413
-    end_number = 413
-    includes = ["CIP", "516"]
+    start_number = 400
+    end_number = 405
+    includes = ["CIP", "516",]
     excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "MIN", "654", "ALF", "ALT", "656"]
 
     filtered_files = fetcher.fetcher(filenames, start_number, end_number, includes, excludes)
@@ -42,10 +42,15 @@ def main():
 
     chunk_size = 10
     result = process_chunks(filtered_files, processor, xpath_batch, namespaces, chunk_size)
-    column = ['Filename', 'Sfcand1', 'Sfcand2', 'Sfcand3', 'Sfcand4', 'Sfcand5', 'Sfcand6', 'Sfcand7', 'Sfcand8']
+    columns_grfp = ['Filename', 'CIPSats_Kallvatten', 'CIP_Dranering', 'CIPSats_NaOH', 'CIP_Dranering2', 'CIPSats_Kallvatten2', 'CIP_Dranering3', 'CIPSats_HWFI', 'CIP_Blasning']
+    columns = ['Filename', 'CIPSats_Kallvatten', 'CIP_Dranering', 'CIPSats_NaOH', 'CIP_Dranering2', 'CIPSats_HWFI', 'CIP_Dranering3', 'CIP_Blasning', 'HygSta']
     
-    df = pd.DataFrame(result, columns=column)
-    print(df['Sfcand1'])
+    df = pd.DataFrame(result, columns=columns)
+    df_grfp = df[df['Filename'].str.contains('GRFP', case=False)]
+    df_grfp.columns = columns_grfp 
+    print(df)
+    print(df_grfp)
+
 if __name__ == "__main__":
     main()
 

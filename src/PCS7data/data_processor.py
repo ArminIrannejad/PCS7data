@@ -1,8 +1,11 @@
 import os
+import numpy as np
 import pandas as pd
 from lxml import etree
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+
+from pandas._libs.tslibs import timestamps
 
 class DataProcessor:
     def __init__(self, path):
@@ -119,4 +122,9 @@ class DataProcessor:
         seconds = total_seconds % 60
         diff_str = f"{hours:02}:{minutes:02}:{seconds:02}"
         return diff_str, start, end
+
+    def time_difference_unix(self, timestamp_lst):
+        if None in timestamp_lst or timestamp_lst is None:
+            return None
+        unix_time = np.array([datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp() for ts in timestamp_lst], dtype=float64)
 
