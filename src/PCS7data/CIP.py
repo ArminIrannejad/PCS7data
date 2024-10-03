@@ -18,15 +18,15 @@ def main():
         path = "C:/Users/se1irar/Downloads/Archive/"
         path = "Z:/Production/ALBFRII/BatchArchives_XML/"
     else:
-        path = "/mnt/c/Users/se1irar/Downloads/Archive/"
         path = os.getenv("MY_PATH")
+        path = "/mnt/c/Users/se1irar/Downloads/Archive/"
 
     processor = DataProcessor(path)
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
 
     start_number = 400
-    end_number = 405
+    end_number = 402
     includes = ["CIP", "516",]
     excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "MIN", "654", "ALF", "ALT", "656"]
 

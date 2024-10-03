@@ -3,15 +3,19 @@ import numpy as np
 import pandas as pd
 from lxml import etree
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
-
-from pandas._libs.tslibs import timestamps
+from datetime import datetime, timezone
 
 class DataProcessor:
+    """
+    Processes data from XML BatchArchives.     
+    """
     def __init__(self, path):
         self.path = path
 
     def extract_batch_number(self, filename):
+        """
+        
+        """
         ignore = 'SB8_34633-5543-83_'
         if filename.startswith(ignore):
             filename = filename[len(ignore):]
@@ -22,6 +26,9 @@ class DataProcessor:
         return None
 
     def recipe_block_id(self, file, xpaths, namespaces):
+        """
+
+        """
         results = [file]
         file_path = os.path.join(self.path, file)
         tree = etree.parse(file_path)
@@ -45,6 +52,9 @@ class DataProcessor:
         return results
 
     def process(self, file, xpaths, namespaces, result_type = 'full'):
+        """
+        
+        """
         results = []
         file_path = os.path.join(self.path, file)       
         tree = etree.parse(file_path)
@@ -65,6 +75,9 @@ class DataProcessor:
         return results
 
     def _get_time(self, file):
+        """
+        Deprecated
+        """
         namespaces = {'ns': 'SIMATIC_BATCH_V8_1_0'}
         xpath = "//ns:Archivebatch/ns:Cr"
         file_path = fr'{self.path}/{file}'
@@ -77,6 +90,9 @@ class DataProcessor:
         return str(list(set(lst))[-1]).split() if len(set(lst)) == 1 else None    
 
     def _time_diff(self, row):
+        """
+        Deprecated
+        """
         if pd.isnull(row['Start_time']) or pd.isnull(row['End_time']):
             return None
         else:
@@ -91,6 +107,9 @@ class DataProcessor:
             return pd.Series([diff_str, total_seconds])
 
     def get_time(self, batch_numbers, files):
+        """
+        Deprecated
+        """
         with ThreadPoolExecutor() as executor:
             timestamps = list(executor.map(self._get_time, files))
         start_times = [timestamp[0] if timestamp is not None else None for timestamp in timestamps]
@@ -108,6 +127,9 @@ class DataProcessor:
         return df
 
     def time_difference(self, timestamp_lst):
+        """
+
+        """
         if None in timestamp_lst:
             return None
         elif timestamp_lst is None:
@@ -122,20 +144,3 @@ class DataProcessor:
         seconds = total_seconds % 60
         diff_str = f"{hours:02}:{minutes:02}:{seconds:02}"
         return diff_str, start, end
-
-    def time_difference_unix(self, timestamp_lst):
-        if None in timestamp_lst or timestamp_lst is None:
-            return None
-        unix_time = np.array([datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp() for ts in timestamp_lst], dtype=np.float64)
-        start = np.min(unix_time)
-        end = np.max(unix_time)
-        total_seconds = end - start
-        hours = total_seconds // 3600
-        minutes = (total_seconds % 3600) // 60
-        seconds = total_seconds % 60
-        diff_str = f"{hours:02}:{minutes:02}:{seconds:02}" 
-        #TODO convert back to ISO8601, millisecond precision?
-        return diff_str, start, end
-
-
-
