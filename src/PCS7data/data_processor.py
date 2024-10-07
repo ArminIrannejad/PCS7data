@@ -56,9 +56,8 @@ class DataProcessor:
         results = []
         file_path = os.path.join(self.path, file)       
         tree = etree.parse(file_path)
-        root = tree.getroot()
         for xpath in xpaths.values():
-            parvalfloats = root.xpath(xpath, namespaces=namespaces)
+            parvalfloats = tree.xpath(xpath, namespaces=namespaces)
             if parvalfloats:
                 unique_lst = list(set(parvalfloats))
                 if result_type == 'first':
