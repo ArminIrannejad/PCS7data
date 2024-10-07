@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.32 (2024-10-07)
+
+### Performance
+
+* Removed uneccessary parsing ([`4294c68`](https://github.com/ArminIrannejad/PCS7data/commit/4294c68462c8a3d72d1d0c11489f8d15fa8ab5c9))
+
 ## v0.3.31 (2024-10-07)
 
 ### Performance
