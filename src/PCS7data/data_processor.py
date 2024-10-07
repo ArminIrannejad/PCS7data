@@ -134,7 +134,7 @@ class DataProcessor:
             return None
         elif timestamp_lst is None:
             return None
-        dt_obj = [datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ") for ts in timestamp_lst]
+        dt_obj = [datetime.fromisoformat(ts) for ts in timestamp_lst]
         start = min(dt_obj)
         end = max(dt_obj)
         diff = end - start

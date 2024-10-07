@@ -26,7 +26,7 @@ def main():
     filenames = os.listdir(path)
 
     start_number = 400
-    end_number = 402
+    end_number = 407
     includes = ["CIP", "516",]
     excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "MIN", "654", "ALF", "ALT", "656"]
 
@@ -46,11 +46,27 @@ def main():
     columns = ['Filename', 'CIPSats_Kallvatten', 'CIP_Dranering', 'CIPSats_NaOH', 'CIP_Dranering2', 'CIPSats_HWFI', 'CIP_Dranering3', 'CIP_Blasning', 'HygSta']
     
     df = pd.DataFrame(result, columns=columns)
-    df_grfp = df[df['Filename'].str.contains('GRFP', case=False)]
-    df_grfp.columns = columns_grfp 
+    df_grfp1_grt11 = df[df['Filename'].str.contains('GRFP1', case=False) & df['Filename'].str.contains('GRT11', case=False)]
+    df_grfp1_grt13 = df[df['Filename'].str.contains('GRFP1', case=False) & df['Filename'].str.contains('GRT13', case=False)]
+    df_grfp1_grt15 = df[df['Filename'].str.contains('GRFP1', case=False) & df['Filename'].str.contains('GRT15', case=False)]
+    df_grfp2_grt12 = df[df['Filename'].str.contains('GRFP2', case=False) & df['Filename'].str.contains('GRT12', case=False)]
+    df_grfp2_grt14 = df[df['Filename'].str.contains('GRFP2', case=False) & df['Filename'].str.contains('GRT14', case=False)]
+    df_grfp2_grt16 = df[df['Filename'].str.contains('GRFP2', case=False) & df['Filename'].str.contains('GRT16', case=False)]
+    df_grfp3_grt12 = df[df['Filename'].str.contains('GRFP3', case=False) & df['Filename'].str.contains('GRT12', case=False)]
+    df_grfp3_grt14 = df[df['Filename'].str.contains('GRFP3', case=False) & df['Filename'].str.contains('GRT14', case=False)]
+    df_grfp3_grt16 = df[df['Filename'].str.contains('GRFP3', case=False) & df['Filename'].str.contains('GRT16', case=False)]
+    df_grfp1_grt11.columns = columns_grfp 
     print(df)
-    print(df_grfp)
+    print(df_grfp1_grt11)
 
+    xpath_grfp = {
+            "VBH": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='XX' and @termid='XX']/@timestamp",
+            }
+"""
+    xpath_VBH = {
+            "VBH": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='XX' and @termid='XX']/@timestamp",
+            }
+"""
 if __name__ == "__main__":
     main()
 
