@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.30 (2024-10-07)
+
+### Performance
+
+* Went from datetime.strptime() to datetime.fromisoformat() only handles iso8601 now ([`d69760c`](https://github.com/ArminIrannejad/PCS7data/commit/d69760cb66026f60184726665474f6babee1c057))
+
 ## v0.3.29 (2024-10-03)
 
 
