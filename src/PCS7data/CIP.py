@@ -46,6 +46,12 @@ def main():
     columns = ['Filename', 'CIPSats_Kallvatten', 'CIP_Dranering', 'CIPSats_NaOH', 'CIP_Dranering2', 'CIPSats_HWFI', 'CIP_Dranering3', 'CIP_Blasning', 'HygSta']
     
     df = pd.DataFrame(result, columns=columns)
+    df_grt11 = df[df['Filename'].str.contains('GRT11', case=False)]
+    df_grt12 = df[df['Filename'].str.contains('GRT12', case=False)]
+    df_grt13 = df[df['Filename'].str.contains('GRT13', case=False)]
+    df_grt14 = df[df['Filename'].str.contains('GRT14', case=False)]
+    df_grt15 = df[df['Filename'].str.contains('GRT15', case=False)]
+    df_grt15 = df[df['Filename'].str.contains('GRT16', case=False)]
     df_grfp1_grt11 = df[df['Filename'].str.contains('GRFP1', case=False) & df['Filename'].str.contains('GRT11', case=False)]
     df_grfp1_grt13 = df[df['Filename'].str.contains('GRFP1', case=False) & df['Filename'].str.contains('GRT13', case=False)]
     df_grfp1_grt15 = df[df['Filename'].str.contains('GRFP1', case=False) & df['Filename'].str.contains('GRT15', case=False)]

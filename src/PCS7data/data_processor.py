@@ -32,10 +32,8 @@ class DataProcessor:
         results = [file]
         file_path = os.path.join(self.path, file)
         tree = etree.parse(file_path)
-        root = tree.getroot()
-        
         for xpath in xpaths.values():
-            sfcands = root.xpath(xpath, namespaces=namespaces)
+            sfcands = tree.xpath(xpath, namespaces=namespaces)
             for sfcand in sfcands:
                 sfcsteps = sfcand.xpath("./ns:Sfcseq/ns:Sfcstep", namespaces=namespaces)
                 sfcsteps_data = []
@@ -62,8 +60,7 @@ class DataProcessor:
         for xpath in xpaths.values():
             parvalfloats = root.xpath(xpath, namespaces=namespaces)
             if parvalfloats:
-                lst = [parvalfloat for parvalfloat in parvalfloats]
-                unique_lst = list(set(lst))
+                unique_lst = list(set(parvalfloats))
                 if result_type == 'first':
                     results.append(str(unique_lst[0]))
                 elif result_type == 'last':
