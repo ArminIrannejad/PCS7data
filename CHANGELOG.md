@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.31 (2024-10-07)
+
+### Performance
+
+* Removed uneccessary list comprehension ([`e42269a`](https://github.com/ArminIrannejad/PCS7data/commit/e42269ac6c135fe81509ba7c258d6d686a823d0d))
+
 ## v0.3.30 (2024-10-07)
 
 ### Performance
