@@ -51,7 +51,7 @@ def main():
     df_grt13 = df[df['Filename'].str.contains('GRT13', case=False)]
     df_grt14 = df[df['Filename'].str.contains('GRT14', case=False)]
     df_grt15 = df[df['Filename'].str.contains('GRT15', case=False)]
-    df_grt15 = df[df['Filename'].str.contains('GRT16', case=False)]
+    df_grt16 = df[df['Filename'].str.contains('GRT16', case=False)]
     df_grfp1_grt11 = df[df['Filename'].str.contains('GRFP1', case=False) & df['Filename'].str.contains('GRT11', case=False)]
     df_grfp1_grt13 = df[df['Filename'].str.contains('GRFP1', case=False) & df['Filename'].str.contains('GRT13', case=False)]
     df_grfp1_grt15 = df[df['Filename'].str.contains('GRFP1', case=False) & df['Filename'].str.contains('GRT15', case=False)]
@@ -61,12 +61,13 @@ def main():
     df_grfp3_grt12 = df[df['Filename'].str.contains('GRFP3', case=False) & df['Filename'].str.contains('GRT12', case=False)]
     df_grfp3_grt14 = df[df['Filename'].str.contains('GRFP3', case=False) & df['Filename'].str.contains('GRT14', case=False)]
     df_grfp3_grt16 = df[df['Filename'].str.contains('GRFP3', case=False) & df['Filename'].str.contains('GRT16', case=False)]
-    df_grfp1_grt11.columns = columns_grfp 
-    print(df)
-    print(df_grfp1_grt11)
+    dfs_filter = [df_grfp1_grt11, df_grfp1_grt13, df_grfp1_grt15, df_grfp2_grt12, df_grfp2_grt14, df_grfp2_grt16, df_grfp3_grt12, df_grfp3_grt14, df_grfp3_grt16]
+    for df in dfs_filter:
+        df.columns = columns_grfp
 
+    print(df_grfp1_grt15)
     xpath_grfp = {
-            "VBH": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='XX' and @termid='XX']/@timestamp",
+            "CIPSats_Kallvatten": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='0' and @termid='40']/@timestamp",
             }
 """
     xpath_VBH = {
