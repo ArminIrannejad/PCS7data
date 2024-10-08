@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.33 (2024-10-08)
+
+
+
 ## v0.3.32 (2024-10-07)
 
 ### Performance
