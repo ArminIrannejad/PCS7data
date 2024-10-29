@@ -70,17 +70,12 @@ def main():
     aoneuth = df_grt16, df_grt12, df_grt13, df_grt11, df_grt15, df_grt14
 
     tuples_list = []
-    for index, row in df_grt14.iterrows():
+    for _, row in df_grt14.iterrows():
         tuples_list.append(row['CIPSats_Kallvatten'])
 
     result_dict_grt14_sfc1 = {t[0]: f"/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid={t[1]} and @termid={t[2]}]/@timestamp" for t in tuples_list[0]}
+    print(tuples_list)
     print(result_dict_grt14_sfc1)
 
 if __name__ == "__main__":
     main()
-
-    """
-    xpath_VBH = {
-            "VBH": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventrph[@contid='XX' and @termid='XX']/@timestamp",
-            }
-    """
