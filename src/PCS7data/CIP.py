@@ -66,7 +66,6 @@ def main():
     for df in dfs_filter:
         df.columns = columns_grfp
 
-    print(df_grt14)
     aoneuth = df_grt16, df_grt12, df_grt13, df_grt11, df_grt15, df_grt14
 
     tuples_list = []
