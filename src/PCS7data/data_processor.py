@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from lxml import etree
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import datetime
 
 class DataProcessor:
     """
@@ -117,7 +117,7 @@ class DataProcessor:
                 'File': files,
         }
         df = pd.DataFrame(dict_time)
-        df[['Difference', 'Total_Seconds']] = df.apply(self._time_diff, axis=1)
+        df[['Difference', 'Total_Seconds']] = df.apply(self._time_diff, axis=1) # pyright: ignore
         df = df.dropna(subset=['Start_time', 'End_time', 'Batch_number'])
         df = df[['Batch_number', 'Difference', 'Start_time', 'End_time', 'File', 'Total_Seconds']]  
         return df
