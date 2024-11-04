@@ -124,7 +124,17 @@ class DataProcessor:
 
     def time_difference(self, timestamp_lst):
         """
+        Calculates the duration between the earliest and latest timestamps in the list.
+        Returns the duration as a string in HH:MM:SS format, along with start and end time.
 
+        Parameters:
+        timestamp_lst (list of str): A list of timestamp strings in ISO 8601 format.
+
+        Returns: 
+        tuple:
+            - diff_str (str) Duration between the earliest and latest timestamps in HH:MM:SS format.
+            - start (datetime): The earliest timestamp as a datetime object.
+            - end (datetime): The latest timestamp as a datetime object.
         """
         if None in timestamp_lst:
             return None
