@@ -136,9 +136,7 @@ class DataProcessor:
             - start (datetime): The earliest timestamp as a datetime object.
             - end (datetime): The latest timestamp as a datetime object.
         """
-        if None in timestamp_lst:
-            return None
-        elif timestamp_lst is None:
+        if not timestamp_lst or None in timestamp_lst:
             return None
         dt_obj = [datetime.fromisoformat(ts) for ts in timestamp_lst]
         start = min(dt_obj)
