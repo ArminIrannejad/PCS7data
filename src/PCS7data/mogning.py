@@ -16,6 +16,7 @@ def process_chunks(files, processor, xpath_mog, namespaces, chunk_size=10):
         with ThreadPoolExecutor() as executor:
             result_time = list(executor.map(lambda file: processor.process(file, xpath_mog, namespaces, 'full'), chunk))
 
+
         time_data.extend(result_time)
     return time_data
 
@@ -36,12 +37,13 @@ def main():
     fetcher = DataFetcher(path)
     filenames = os.listdir(path)
 
-    start_number = 404
-    end_number = 410
+    start_number = 400
+    end_number = 405
     includes = ["516"]
     excludes = ["TEST", "EXTRA", "BUFF", "SAT", "SIP", "65", "MIN", "CIP", "654", "ALF", "ALT"]
 
     filtered_files = fetcher.fetcher(filenames, start_number, end_number, includes, excludes)
+    print(len(filtered_files))
 
 
     if os.path.exists(output_path):
@@ -50,7 +52,9 @@ def main():
     else:
         existing_filenames = set()
 
+    print(len(existing_filenames))
     new_files = [file for file in filtered_files if file not in existing_filenames]
+    print(len(new_files))
 
     batch_numbers = list(map(processor.extract_batch_number, new_files))
     print(batch_numbers)
@@ -61,14 +65,11 @@ def main():
             "end_mog": "/ns:Archivebatch/ns:Cr/ns:Eventcltn/ns:Eventsub[@contid='25' and @termid='0']/@timestamp"
     }
 
-    chunk_size = 10  
-    time_data = process_chunks(new_files, processor, xpath_mog, namespaces, chunk_size)
+    time_data = process_chunks(new_files, processor, xpath_mog, namespaces)
 
     
     combined = [row[0] + row[1] if row[0] and row[1] else [] for row in time_data] 
     diff = [processor.time_difference(timestamp) if timestamp is not None else None for timestamp in combined]
-    print(diff)
-
     difference = [tup[0] if tup is not None else None for tup in diff]
     start_times = [tup[1].strftime("%Y-%m-%dT%H:%M:%S.%fZ") if tup is not None else None for tup in diff]
     end_times = [tup[2].strftime("%Y-%m-%dT%H:%M:%S.%fZ") if tup is not None else None for tup in diff]
